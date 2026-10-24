@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hacking Test - Post</title>
+        <link rel="stylesheet" href="main.css" />
+    </head>
+    <body>
+        <main>
+            <form action="/create-post" method="post">
+                <h1>Create Post</h1>
+                <p>
+                    <label for="title">Title</label>
+                    <br />
+                    <input type="text" id="title" name="title" required />
+                </p>
+                <p>
+                    <label for="content">Content</label>
+                    <br />
+                    <textarea id="content" name="content" required></textarea>
+                </p>
+                <p>
+                    <input type="submit" value="Create Post" />
+                </p>
+            </form>
+        </main>
+    </body>
+</html>
