@@ -5,18 +5,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacking Test</title>
+    <style>
+        .not-signed-in {
+            display: none;
+        }
+
+        .signed-in {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
     <nav>
-        <a href="/signin">Sign In</a>
-        <a href="/signup">Sign Up</a>
+        <div class="not-signed-in">
+            <a href="/signin.html">Sign In</a>
+            <a href="/signup.html">Sign Up</a>
+        </div>
+        <div class="signed-in">
+            <a href="/signout">Sign Out</a>
+        </div>
     </nav>
     <h1>Hacking Test</h1>
     <p>User: <span id="username"></span></p>
 
     <script>
-        // TODO: Hide nav when signed in
+        function getCookie(name) {
+            for (let cookie of document.cookie.split(";")) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "="))
+                    return cookie.split("=")[1];
+            }
+        }
+
+        const username = getCookie("username"),
+            usernameDisplay = document.getElementById("username");
+        if (username) {
+            usernameDisplay.innerText = username;
+            document.querySelector(".signed-in").style.display = "block";
+        } else {
+            usernameDisplay.innerText = "<Not signed in>";
+            document.querySelector(".not-signed-in").style.display = "block";
+        }
     </script>
 </body>
 

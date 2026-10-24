@@ -1,7 +1,9 @@
 import express from "express";
 import sqlite from "node:sqlite";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 
-const db = new sqlite.Database("user.db");
+const db = new sqlite.Database("database.db");
 
 db.exec(`CREATE TABLE IF NOT EXISTS user (
   username TEXT PRIMARY KEY NOT NULL,
@@ -16,7 +18,16 @@ app.use(express.static("public"));
 app.use((_req, res, next) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   next();
-})
+});
+app.use(
+  session({
+    secret: "abcdefg",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 /* 밀리초(ms) */ },
+  }),
+);
+app.use(cookieParser());
 
 app.post("/signin", (req, res) => {
   const { username, password } = req.body;
@@ -30,11 +41,21 @@ app.post("/signin", (req, res) => {
   try {
     const result = db.prepare(statement).all();
     if (!result[0]) {
-      res.status(401).send({ message: "아이디와 비밀번호가 일치하지 않습니다." });
+      res
+        .status(401)
+        .send({ message: "아이디와 비밀번호가 일치하지 않습니다." });
       return;
     }
 
-    res.status(200).send({ message: "로그인 성공" });
+    req.session.username = username;
+    req.session.save((err) => {
+      if (err) throw err;
+
+      res.cookie("username", username, {
+        maxAge: 1000 * 60 * 60,
+      });
+      res.redirect("/");
+    });
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -45,15 +66,32 @@ app.post("/signup", (req, res) => {
 
   try {
     db.prepare(statement).run();
-    res.status(200).send({ message: "회원가입 성공" });
+    res.redirect("/signin.html");
   } catch (error) {
-    if (error.errcode === 1555) { // Constraint failed
+    // Constraint failed
+    if (error.errcode === 1555) {
       res.status(409).send({ message: "이미 존재하는 아이디입니다." });
       return;
     }
 
     res.status(500).send({ error });
   }
+});
+app.get("/signout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      res
+        .status(500)
+        .send({
+          error: err,
+          message: "세션을 삭제하는 도중 오류가 발생했습니다.",
+        });
+      return;
+    }
+
+    res.clearCookie("username");
+    res.redirect("/");
+  });
 });
 
 app.listen(8080, () => console.log("서버 시작됨: http://localhost:8080"));
