@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hacking Test - View Post</title>
+        <link rel="stylesheet" href="/static/main.css" />
+        <style>
+            .content {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                width: 100%;
+                background-color: rgb(240, 240, 240);
+                padding: 0.2rem;
+            }
+
+            .author,
+            .created-at {
+                font-size: 0.8rem;
+                color: gray;
+            }
+
+            .info {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1 class="title"><%= post.title %></h1>
+            <p class="info">
+                <span class="author"><%= post.author %></span>
+                <span class="created-at"><%= post.created_at %></span>
+            </p>
+            <p class="content"><%= post.content %></p>
+            <a href="/">Back to Home</a>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hacking Test</title>
+        <link rel="stylesheet" href="/static/main.css" />
+        <style>
+            .not-signed-in {
+                display: none;
+            }
+
+            .signed-in {
+                display: none;
+            }
+
+            .not-signed-in,
+            .signed-in {
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            ul {
+                width: 100%;
+                list-style: none;
+                padding: 0;
+                background-color: lightgray;
+            }
+
+            li {
+                margin-bottom: 0.5rem;
+                padding: 0.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav>
+            <div class="not-signed-in" style="display: <%= username ? 'none' : 'flex' %>">
+                <a href="/signin">Sign In</a>
+                <a href="/signup">Sign Up</a>
+            </div>
+            <div class="signed-in" style="display: <%= username ? 'flex' : 'none' %>">
+                <a href="/signout">Sign Out</a>
+                <a href="/post">Create Post</a>
+            </div>
+        </nav>
+        <main>
+            <h1>Hacking Test</h1>
+            <p>User: <%- username ? "<b>" + username + "</b>" : "<i>Not signed in</i>" %></p>
+            <ul><%= posts.map((post) => `<li><a href="/view-post/${post.id}">${post.title}</a><span>${post.created_at}</span></li>`).join("") %></ul>
+        </main>
+    </body>
+</html>

@@ -1,7 +1,7 @@
 import express from "express"
 import sqlite from "node:sqlite"
 import session from "express-session"
-import cookieParser from "cookie-parser"
+import path from "path"
 
 const db = new sqlite.Database("database.db")
 
@@ -21,11 +21,7 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static("public"))
-app.use((_req, res, next) => {
-    res.setHeader("Content-Type", "application/json; charset=utf-8")
-    next()
-})
+app.use("/static", express.static("static"))
 app.use(
     session({
         secret: "abcdefg",
@@ -34,7 +30,24 @@ app.use(
         cookie: { maxAge: 1000 * 60 * 60 /* 밀리초(ms) */ },
     }),
 )
-app.use(cookieParser())
+
+// TODO: Fix ejs rendering
+app.set("view engine", "ejs")
+app.set("views", path.join("./views"))
+
+app.get("/", (req, res) => {
+    const statement = `SELECT * FROM post ORDER BY created_at DESC`
+
+    try {
+        const posts = db.prepare(statement).all()
+        res.render("index", { username: req.session.username, posts })
+    } catch (error) {
+        res.status(500).send({ error })
+    }
+})
+app.get("/signin", (_req, res) => res.render("signin"))
+app.get("/signup", (_req, res) => res.render("signup"))
+app.get('/create-post', (_req, res) => res.render("create-post"))
 
 app.post("/signin", (req, res) => {
     const { username, password } = req.body
@@ -75,7 +88,7 @@ app.post("/signup", (req, res) => {
 
     try {
         db.prepare(statement).run()
-        res.redirect("/signin.html")
+        res.redirect("/signin")
     } catch (error) {
         // Constraint failed
         if (error.errcode === 1555) {
@@ -122,23 +135,14 @@ app.post("/create-post", (req, res) => {
         res.status(500).send({ error })
     }
 })
-app.get("/posts", (_req, res) => {
-    const statement = `SELECT * FROM post ORDER BY created_at DESC`
-
-    try {
-        const result = db.prepare(statement).all()
-        res.send(result)
-    } catch (error) {
-        res.status(500).send({ error })
-    }
-})
-app.get("/post/:id", (req, res) => {
+app.get("/view-post/:id", (req, res) => {
     const { id } = req.params
     const statement = `SELECT * FROM post WHERE id = ${id}`
 
     try {
         const result = db.prepare(statement).all()
-        res.send(result[0])
+        const post = result[0]
+        res.render("view-post", { post })
     } catch (error) {
         res.status(500).send({ error })
     }
