@@ -46,13 +46,13 @@
             </div>
             <div class="signed-in" style="display: <%= username ? 'flex' : 'none' %>">
                 <a href="/signout">Sign Out</a>
-                <a href="/post">Create Post</a>
+                <a href="/create-post">Create Post</a>
             </div>
         </nav>
         <main>
             <h1>Hacking Test</h1>
             <p>User: <%- username ? "<b>" + username + "</b>" : "<i>Not signed in</i>" %></p>
-            <ul><%= posts.map((post) => `<li><a href="/view-post/${post.id}">${post.title}</a><span>${post.created_at}</span></li>`).join("") %></ul>
+            <ul><%- posts.map((post) => `<li><a href="/view-post/${post.id}">${post.title}</a><span>${post.created_at}</span></li>`).join("") %></ul>
         </main>
     </body>
 </html>

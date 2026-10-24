@@ -31,7 +31,6 @@ app.use(
     }),
 )
 
-// TODO: Fix ejs rendering
 app.set("view engine", "ejs")
 app.set("views", path.join("./views"))
 
